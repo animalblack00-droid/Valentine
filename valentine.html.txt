@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>💗 Will You Be My Valentine?</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #ffd6e8, #fff);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    overflow: hidden;
+    position: relative;
+}
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 25px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    transition: transform 0.2s;
+}
+h1 {
+    color: #e91e63;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+button {
+    background: #e91e63;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    margin: 10px;
+    border-radius: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+button.secondary {
+    background: #f8bbd0;
+    color: #880e4f;
+}
+button:hover { transform: scale(1.1); }
+img { max-width: 100%; border-radius: 15px; margin-top: 15px; }
+/* floating hearts */
+.heart {
+    position: absolute;
+    font-size: 2rem;
+    animation: float 4s infinite;
+}
+@keyframes float {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(-500px) rotate(360deg); opacity: 0; }
+}
+/* confetti */
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #e91e63;
+    top: 0;
+    animation: fall 3s linear infinite;
+}
+@keyframes fall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(600px) rotate(360deg); opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="card" id="app">
+    <h1>Are you still single? 💭</h1>
+    <button onclick="answer('Single: Yes', showValentine)">Yes</button>
+    <button class="secondary" onclick="answer('Single: No', showSure)">No</button>
+</div>
+
+<script>
+let answers = [];
+
+// Google Form endpoint
+const ENDPOINT_URL = "https://docs.google.com/forms/d/e/1FAIpQLSen4Vh4cx6k8MtHWDCbPhp_kYwbE3PlDWge2O5PZYnkBGIhDQ/formResponse";
+const ENTRY_ID = "entry.1722341011";
+
+// send answers silently
+function sendData() {
+    const xhr = new XMLHttpRequest();
+    const data = new FormData();
+    data.append(ENTRY_ID, answers.join(" | "));
+    xhr.open("POST", ENDPOINT_URL, true);
+    xhr.send(data);
+}
+
+// floating hearts
+function createHeart() {
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    heart.innerText = '💗';
+    heart.style.left = Math.random() * window.innerWidth + 'px';
+    heart.style.fontSize = (Math.random()*20 + 15) + 'px';
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 4000);
+}
+setInterval(createHeart, 500);
+
+// confetti
+function createConfetti() {
+    for(let i=0;i<50;i++){
+        const conf = document.createElement('div');
+        conf.className = 'confetti';
+        conf.style.left = Math.random()*window.innerWidth+'px';
+        conf.style.backgroundColor = `hsl(${Math.random()*360}, 80%, 60%)`;
+        conf.style.width = Math.random()*10 + 5 +'px';
+        conf.style.height = conf.style.width;
+        document.body.appendChild(conf);
+        setTimeout(() => conf.remove(), 4000);
+    }
+}
+
+// main answer function
+function answer(text, next) {
+    answers.push(text);
+    sendData(); // send to Google Form silently
+    next();
+}
+
+// --- PAGE FLOW ---
+function showSure() {
+    document.getElementById("app").innerHTML = `
+        <h1>Are you sure? 😏</h1>
+        <button onclick="answer('Sure: Yes', refusal)">Yes</button>
+        <button class="secondary" onclick="answer('Sure: No', showValentine)">No</button>
+    `;
+}
+
+function showValentine() {
+    document.getElementById("app").innerHTML = `
+        <h1>Will you be my Valentine? 💘</h1>
+        <button onclick="answer('Valentine: Yes', confirmYes)">Yes</button>
+        <button class="secondary" onclick="answer('Valentine: No', refusal)">No</button>
+    `;
+}
+
+function confirmYes() {
+    document.getElementById("app").innerHTML = `
+        <h1>Are you 100% sure? 😏</h1>
+        <button onclick="answer('100% Sure: Yes', success)">Yes</button>
+        <button class="secondary" onclick="answer('100% Sure: No', refusal)">No</button>
+    `;
+}
+
+function success() {
+    createConfetti();
+    document.getElementById("app").innerHTML = `
+        <h1>Good choice my love 💗</h1>
+        <img src="https://i.imgflip.com/4/4t0m5.jpg" alt="Meme">
+        <p>You just made my heart happy ❤️</p>
+    `;
+}
+
+function refusal() {
+    document.getElementById("app").innerHTML = `
+        <h1>Hahah all good 😄</h1>
+        <p>I am happy for you 💕</p>
+    `;
+}
+</script>
+
+</body>
+</html>
